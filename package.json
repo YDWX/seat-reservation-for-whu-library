@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/IwYvI/seat-reservation-for-whu-library#readme",
   "dependencies": {
+    "async": "^2.1.5",
     "bufferhelper": "^0.2.1",
     "imap": "^0.8.19",
     "log4js": "^1.1.0",

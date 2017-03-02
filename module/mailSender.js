@@ -1,19 +1,20 @@
 const nodemailer = require('nodemailer');
+const emailConfig = require('../config/email.conf');
 
 class MailSender {
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: "smtp.sina.com",
+      host: emailConfig.smtp.host,
       secure: true,
-      port: 465,
+      port: emailConfig.smtp.port,
       pool: true,
       auth: {
-        user: 'seatreservation@sina.com',
-        pass: 'Lu5y)E5pj=bQbf'
+        user: emailConfig.username,
+        pass: emailConfig.password
       }
     }, {
       // Default options for the message. Used if specific values are not set
-      from: 'seatreservation <seatreservation@sina.com>'
+      from: emailConfig.nickname + " <" + emailConfig.username + ">"
     });
   }
   send(target, subject, html) {

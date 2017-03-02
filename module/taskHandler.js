@@ -11,7 +11,7 @@ class TaskHandler {
     this.seatSchedule = null;
 
     this.mailSender = new MailSender();
-    this.mailReceiver = new MailReceiver(this.mailSender);
+    this.mailReceiver = new MailReceiver();
     // this.seatReservation = new SeatReservation();
   }
   start() {

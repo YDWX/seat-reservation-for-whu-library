@@ -1,31 +1,34 @@
 var Imap = require('imap'),
   inspect = require('util').inspect;
+const emailConfig = require('../config/email.conf');
 
 class MailReceiver {
-  constructor(mailSender) {
-    this.mailSender = mailSender;
-
+  constructor() {
     this.imap = new Imap({
-      user: 'seatreservation@sina.com',
-      password: 'Lu5y)E5pj=bQbf',
-      host: 'imap.sina.com',
-      port: 993,
+      user: emailConfig.username,
+      password: emailConfig.password,
+      host: emailConfig.imap.host,
+      port: emailConfig.imap.port,
       tls: true
     });
-
-    this.initImap(this.imap);
+    this._initImap(this.imap);
 
   }
-  initImap(imap) {
+  _initImap() {
+    var imap = this.imap;
     imap.on('ready', () => {
       imap.openBox('INBOX', true, (err, box) => {
         if (err) throw err;
         imap.search(['UNSEEN'], (err, results) => {
           console.log('unseen mail count: ' + results.length);
           if (err) throw err;
+          if (results.length === 0) {
+            imap.end();
+            return;
+          }
+
           var f = imap.fetch(results, {
-            bodies: 'HEADER.FIELDS (FROM SUBJECT)',
-            markSeen: true
+            bodies: 'HEADER.FIELDS (FROM SUBJECT)'
           });
 
           f.on('message', (msg, seqno) => {
@@ -52,6 +55,12 @@ class MailReceiver {
             console.log('Done fetching all messages!');
             imap.end();
           });
+
+          var s = imap.setFlags(results, "SEEN", function (err) {
+            if (err) {
+              console.log("Set flags error:" + err);
+            }
+          })
         });
       });
     });
