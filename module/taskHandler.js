@@ -1,8 +1,8 @@
 var schedule = require('node-schedule');
 
-var SeatReservation = require("./seatReservation.js");
-var MailReceiver = require("./mailReceiver.js");
-var MailSender = require("./mailSender.js");
+// var SeatReservation = require("./seatReservation.js");
+var MailReceiver = require("./mail/mailReceiver");
+// var MailSender = require("./mailSender.js");
 
 class TaskHandler {
   constructor() {
@@ -10,7 +10,7 @@ class TaskHandler {
     this.mailSchedule = null;
     this.seatSchedule = null;
 
-    this.mailSender = new MailSender();
+    // this.mailSender = new MailSender();
     this.mailReceiver = new MailReceiver();
     // this.seatReservation = new SeatReservation();
   }

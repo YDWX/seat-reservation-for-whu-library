@@ -21,6 +21,7 @@
     "bufferhelper": "^0.2.1",
     "imap": "^0.8.19",
     "log4js": "^1.1.0",
+    "mailparser": "^2.0.2",
     "mongoose": "^4.8.4",
     "mongoose-auto-increment": "^5.0.1",
     "node-schedule": "^1.2.0",
