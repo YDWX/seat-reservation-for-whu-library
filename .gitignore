@@ -37,4 +37,7 @@ jspm_packages
 .node_repl_history
 
 # Option
+
 config
+
+.vscode
