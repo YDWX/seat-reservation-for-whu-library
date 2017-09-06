@@ -1,5 +1,3 @@
-var autoIncrement = require('mongoose-auto-increment'); //自增ID 模块
-
 var db = require("./db.js");
 
 var Schema = db.Schema;
@@ -48,10 +46,6 @@ var userSchema = new Schema({
       default: 0
     },
   }
-});
-userSchema.plugin(autoIncrement.plugin, {
-  model: "user",
-  field: "id"
 });
 
 var userModel = db.model("user", userSchema);
