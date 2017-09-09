@@ -1,4 +1,8 @@
-var taskHandler = require("./module/taskHandler.js");
+const models = require("./models");
+const taskHandler = require("./modules/taskHandler.js");
 
-taskHandler.start();
+models.sequelize.sync().then(()=>{
+  taskHandler.start();
+})
+
 

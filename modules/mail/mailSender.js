@@ -19,7 +19,7 @@ class MailSender {
   }
   send(target, subject, html) {
     // setup email data with unicode symbols
-    var mailOptions = {
+    const mailOptions = {
       to: target, // list of receivers
       subject: subject, // Subject line
       html: html // html body

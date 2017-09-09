@@ -18,11 +18,15 @@
   },
   "homepage": "https://github.com/IwYvI/seat-reservation-for-whu-library#readme",
   "dependencies": {
+    "axios": "^0.16.2",
     "imap": "^0.8.19",
+    "kue": "^0.11.6",
+    "lodash": "^4.17.4",
     "log4js": "^2.3.3",
     "mailparser": "^2.0.5",
-    "mongoose": "^4.11.10",
+    "mysql2": "^1.4.2",
     "node-schedule": "^1.2.4",
-    "nodemailer": "^4.1.0"
+    "nodemailer": "^4.1.0",
+    "sequelize": "^4.8.0"
   }
 }

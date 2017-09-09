@@ -16,10 +16,10 @@ class MailReceiver {
       tls: true
     });
     // this.mailAnalysor = new MailReceiver();
-    this._initImap(this.imap);
+    this._initImap();
   }
   _initImap() {
-    var imap = this.imap;
+    const imap = this.imap;
     imap.on('ready', () => {
       // 打开信箱
       imap.openBox('INBOX', true, (err, box) => {
@@ -34,17 +34,18 @@ class MailReceiver {
             return;
           }
           // 获取邮件
-          var f = imap.fetch(results, {
+          const f = imap.fetch(results, {
             bodies: ''
           });
 
           f.on('message', (msg, seqno) => {
             console.log('Message #%d', seqno);
-            var prefix = '(#' + seqno + ') ';
+            const prefix = '(#' + seqno + ') ';
             msg.on('body', (stream, info) => {
               // if (info.which === 'TEXT')
               //   console.log(prefix + 'Body [%s] found, %d total bytes', inspect(info.which), info.size);
-              var buffer = '', count = 0;
+              let buffer = '',
+                count = 0;
               stream.on('data', (chunk) => {
                 count += chunk.length;
                 buffer += chunk.toString('utf8');
@@ -57,9 +58,9 @@ class MailReceiver {
                 //   {console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));}
                 // else
                 //   {
-                    simpleParser(buffer,(err, mail)=>{
-                      console.log(mail.text);
-                    })
+                simpleParser(buffer, (err, mail) => {
+                  console.log(mail.text);
+                })
                 //   console.log(prefix + 'Body [%s] Finished', inspect(info.which));}
               });
             });
