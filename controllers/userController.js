@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const models = require('../models');
 const ruleController = require('../controllers/ruleController')
 
@@ -97,8 +98,14 @@ class UserController {
       }]
     }).then((userList) => {
       if (userList && userList.length) {
-        userList = userList.map((userModel) => {
+        userList = _.map(userList, (userModel) => {
           userModel.computedRule = ruleController.computeRules(userModel.rules);
+          return userModel;
+        }).filter((userModel) => {
+          if (userModel.computedRule && userModel.computedRule.length) {
+            return true;
+          }
+          return false;
         })
         return userList;
       }

@@ -13,17 +13,7 @@ class UserManager {
    * @memberOf UserManager
    */
   async createUser(email, username, password) {
-    try {
-      const token = await userManager.login(username, password);
-      if (token) {
-        const userModel = await userController.createUser(email, username, password);
-        await userController.saveToken(userModel.id, token);
-      } else {
-        // 账号或密码错误
-      }
-    } catch (e) {
-
-    }
+    const userModel = await userController.createUser(email, username, password);
   }
 
   login(username, password) {

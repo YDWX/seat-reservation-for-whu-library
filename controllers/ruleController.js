@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const models = require('../models');
 
 class RuleController {
@@ -54,7 +55,7 @@ class RuleController {
 
   computeRules(ruleList) {
     let reduceRule = {}
-    ruleList.forEach((ruleModel) => {
+    _.forEach(ruleList, (ruleModel) => {
       reduceRule = Object.assign(reduceRule, ruleModel);
     })
     let computedRule = {

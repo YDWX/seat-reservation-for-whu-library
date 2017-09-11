@@ -16,4 +16,5 @@ class SeatManager {
   }
 }
 
-module.exports = SeatManager;
+const seatManager = new SeatManager();
+module.exports = seatManager;

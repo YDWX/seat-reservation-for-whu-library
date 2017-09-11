@@ -1,11 +1,7 @@
 const kue = require('kue');
 const queue = kue.createQueue();
 
-const taskManager = require('./task/taskManager')
-
-//seat
-//gettoken
-//email
+const taskManager = require('./taskManager')
 
 queue.process('seat', 15, (job, done) => {
   try {
@@ -25,9 +21,31 @@ queue.process('email', (job, ctx, done) => {
   done();
 })
 
+/**
+ * 检测新一天的抢座时候开启
+ */
+queue.process('seatBootstrap', (job, done) => {
+
+})
+
+/**
+ * 抢座的登陆
+ */
 queue.process('login', 15, (job, done) => {
   try {
     await taskManager.executeLoginTask(job);
+  } catch (e) {
+
+  }
+  done();
+})
+
+/**
+ * 创建账号的验证
+ */
+queue.process('verify', 15, (job, done) => {
+  try {
+    await taskManager.executeVerifyTask(job);
   } catch (e) {
 
   }
