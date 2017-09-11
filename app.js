@@ -1,8 +1,8 @@
 const models = require("./models");
-const taskHandler = require("./modules/taskHandler.js");
+const schedule = require("./modules/schedule.js");
 
 // models.sequelize.sync().then(()=>{
-  taskHandler.start();
+  schedule.start();
 // })
 
 

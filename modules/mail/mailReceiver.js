@@ -7,7 +7,7 @@ const mailConfig = require('../../config/mail.conf');
 const mailManager = require('./mailManager');
 
 class MailReceiver {
-  constructor() {
+  constructor(mailAnalysor) {
     this.imap = new Imap({
       user: mailConfig.username,
       password: mailConfig.password,
@@ -15,10 +15,12 @@ class MailReceiver {
       port: mailConfig.imap.port,
       tls: true
     });
+    this.mailAnalysor = mailAnalysor;
     this._initImap();
   }
   _initImap() {
     const imap = this.imap;
+    const mailAnalysor = this.mailAnalysor;
     imap.on('ready', () => {
       // 打开信箱
       imap.openBox('INBOX', true, (err, box) => {
@@ -45,9 +47,8 @@ class MailReceiver {
               });
               stream.once('end', () => {
                 simpleParser(buffer, (err, mail) => {
-                  console.log(mail.from.value[0].address);
-                  console.log(mail.subject);
-                  console.log(mail.text);
+                  if (err) throw err;
+                  mailAnalysor(mail.from.value[0].address, mail.subject, mail.text);
                 })
               });
             });
@@ -89,5 +90,4 @@ class MailReceiver {
   }
 }
 
-const mailReceiver = new MailReceiver();
-module.exports = mailReceiver;
+module.exports = MailReceiver;

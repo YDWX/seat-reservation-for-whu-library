@@ -31,14 +31,14 @@ module.exports = {
   /**
    * 提交选座信息
    * 
+   * @param {any} token 
    * @param {any} date 
    * @param {any} seat 
    * @param {any} startTime 
    * @param {any} endTime 
-   * @param {any} token 
    * @returns 
    */
-  POST_RESERVATION(date, seat, startTime, endTime, token) {
+  POST_RESERVATION(token, date, seat, startTime, endTime) {
     return axios.post('/v2/freeBook', qs.stringify({
       date,
       seat,

@@ -48,22 +48,26 @@ class RuleController {
         ['createdAt', 'ASC']
       ]
     }).then((ruleList) => {
-      let reduceRule = {}
-      ruleList.forEach((ruleModel) => {
-        reduceRule = Object.assign(reduceRule, ruleModel);
-      })
-      let computedRule = {
-        mon: reduceRule.mon,
-        tue: reduceRule.tue,
-        wed: reduceRule.wed,
-        thu: reduceRule.thu,
-        fri: reduceRule.fri,
-        sat: reduceRule.sat,
-        sun: reduceRule.sun,
-        preferSeat: reduceRule.preferSeat
-      }
-      return computedRule;
+      return ruleController.computeRules(ruleList);
     })
+  }
+
+  computeRules(ruleList) {
+    let reduceRule = {}
+    ruleList.forEach((ruleModel) => {
+      reduceRule = Object.assign(reduceRule, ruleModel);
+    })
+    let computedRule = {
+      mon: reduceRule.mon,
+      tue: reduceRule.tue,
+      wed: reduceRule.wed,
+      thu: reduceRule.thu,
+      fri: reduceRule.fri,
+      sat: reduceRule.sat,
+      sun: reduceRule.sun,
+      preferSeat: reduceRule.preferSeat
+    }
+    return computedRule;
   }
 }
 const ruleController = new RuleController();

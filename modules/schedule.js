@@ -1,14 +1,13 @@
 const schedule = require('node-schedule');
-// const kue = require('kue'),
-//   queue = kue.createQueue();
 
 const models = require("../models");
+const queue = require('./queue');
 
 // var seatReservation = require("./seatReservation.js");
 const mailReceiver = require("./mail/mailReceiver");
 // var mailSender = require("./mailSender.js");
 
-class TaskHandler {
+class Schedule {
   constructor() {
 
     this.mailSchedule = null;
@@ -39,4 +38,4 @@ class TaskHandler {
   }
 }
 
-module.exports = new TaskHandler();
+module.exports = new Schedule();

@@ -1,9 +1,9 @@
 class MailManager {
-  constructor(){
+  constructor() {
 
   }
-  execute(mail){
-    
+  execute(mail) {
+
   }
 }
 

@@ -1,4 +1,5 @@
 const models = require('../models');
+const ruleController = require('../controllers/ruleController')
 
 class UserController {
   constructor() {}
@@ -81,6 +82,27 @@ class UserController {
         return false;
       }
       return true;
+    })
+  }
+
+  getActiveUsers() {
+    return models.user.findAll({
+      where: {
+        disabled: false,
+        status: true
+      },
+      include: [{
+        model: models.rule,
+        as: "rules"
+      }]
+    }).then((userList) => {
+      if (userList && userList.length) {
+        userList = userList.map((userModel) => {
+          userModel.computedRule = ruleController.computeRules(userModel.rules);
+        })
+        return userList;
+      }
+      return null;
     })
   }
 
