@@ -22,6 +22,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       default: false
     },
+    notification: {
+      type: DataTypes.BOOLEAN,
+      default: true
+    },
     token: DataTypes.STRING,
     lastLogin: DataTypes.DATE
   });

@@ -1,12 +1,12 @@
 const schedule = require('node-schedule');
-const kue = require('kue'),
-  queue = kue.createQueue();
+// const kue = require('kue'),
+//   queue = kue.createQueue();
 
 const models = require("../models");
 
-// var SeatReservation = require("./seatReservation.js");
-const MailReceiver = require("./mail/mailReceiver");
-// var MailSender = require("./mailSender.js");
+// var seatReservation = require("./seatReservation.js");
+const mailReceiver = require("./mail/mailReceiver");
+// var mailSender = require("./mailSender.js");
 
 class TaskHandler {
   constructor() {
@@ -14,16 +14,13 @@ class TaskHandler {
     this.mailSchedule = null;
     this.seatSchedule = null;
 
-    // this.mailSender = new MailSender();
-    this.mailReceiver = new MailReceiver();
-    // this.seatReservation = new SeatReservation();
   }
   start() {
     /**
      * 每一分钟检测一次邮件
      */
     // this.mailSchedule = schedule.scheduleJob('*/1 * * * *', () => {
-    this.mailReceiver.execute();
+    mailReceiver.execute();
     // });
 
     /**
@@ -36,8 +33,8 @@ class TaskHandler {
     // this.mailSender.send("635020058@qq.com", "实验邮件", "没有内容");
   }
   stop() {
-    this.mailSchedule.cancel();
-    this.seatSchedule.cancel();
+    mailSchedule.cancel();
+    seatSchedule.cancel();
     models.sequelize.close();
   }
 }

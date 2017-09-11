@@ -4,7 +4,7 @@ const inspect = require('util').inspect;
 const simpleParser = require('mailparser').simpleParser;
 
 const mailConfig = require('../../config/mail.conf');
-const MailAnalysor = require('./mailAnalysor');
+const mailManager = require('./mailManager');
 
 class MailReceiver {
   constructor() {
@@ -15,7 +15,6 @@ class MailReceiver {
       port: mailConfig.imap.port,
       tls: true
     });
-    // this.mailAnalysor = new MailReceiver();
     this._initImap();
   }
   _initImap() {
@@ -39,33 +38,18 @@ class MailReceiver {
           });
 
           f.on('message', (msg, seqno) => {
-            console.log('Message #%d', seqno);
-            const prefix = '(#' + seqno + ') ';
             msg.on('body', (stream, info) => {
-              // if (info.which === 'TEXT')
-              //   console.log(prefix + 'Body [%s] found, %d total bytes', inspect(info.which), info.size);
-              let buffer = '',
-                count = 0;
+              let buffer = '';
               stream.on('data', (chunk) => {
-                count += chunk.length;
                 buffer += chunk.toString('utf8');
-                // if (info.which === 'TEXT')
-                //   console.log(prefix + 'Body [%s] (%d/%d)', inspect(info.which), count, info.size);
               });
               stream.once('end', () => {
-                // console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
-                // if (info.which !== 'TEXT')
-                //   {console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));}
-                // else
-                //   {
                 simpleParser(buffer, (err, mail) => {
+                  console.log(mail.from.value[0].address);
+                  console.log(mail.subject);
                   console.log(mail.text);
                 })
-                //   console.log(prefix + 'Body [%s] Finished', inspect(info.which));}
               });
-            });
-            msg.once('end', () => {
-              console.log(prefix + 'Finished');
             });
           });
 
@@ -105,4 +89,5 @@ class MailReceiver {
   }
 }
 
-module.exports = MailReceiver;
+const mailReceiver = new MailReceiver();
+module.exports = mailReceiver;

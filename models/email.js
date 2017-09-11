@@ -25,7 +25,8 @@ module.exports = function (sequelize, DataTypes) {
       }
     })
     email.belongsTo(models.task, {
-      as: "targetTask"
+      as: "targetTask",
+      constraints: false
     })
   }
 

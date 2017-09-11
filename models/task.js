@@ -2,18 +2,9 @@
 
 module.exports = function (sequelize, DataTypes) {
   const task = sequelize.define("task", {
-    seat: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    startTime: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    endTime: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
+    seat:  DataTypes.INTEGER,
+    startTime: DataTypes.INTEGER,
+    endTime: DataTypes.INTEGER,
     status: {
       type: DataTypes.BOOLEAN,
       default: false
@@ -22,7 +13,6 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       default: false
     },
-    taskTime: DataTypes.DATE,
     taskType: {
       type: DataTypes.STRING,
       allowNull: false,
