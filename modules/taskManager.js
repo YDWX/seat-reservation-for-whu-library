@@ -8,7 +8,9 @@ const ruleController = require('../controllers/ruleController');
 const userManager = require('./user/userManager');
 const seatManager = require('./seat/seatManager');
 
+const mailSender = require('./mail/mailSender');
 const queue = require('queue');
+const date = require('./Date');
 class TaskManager {
   constructor() {}
 
@@ -45,6 +47,7 @@ class TaskManager {
         text
       } = job;
       //TODO:
+      new mailSender().send(to, "图书馆座位预约", text);
     })
   }
 
@@ -62,9 +65,11 @@ class TaskManager {
             const during = rule[(new Date()).toString().slice(0, 3).toLowerCase()];
             if(rule[during]){
               const [startHour, startMin, endHour, endMin] = during.split(' ').map((item)=>{return parseInt(item)});
+              const today = new date();
+              const tomorrow = today.setDate(today.getDate()+1).toLocaleDateString();
               queue.create('seat',{
                 token,
-                date: new Date(),
+                date: tomorrow.Format('yyyy-MM-dd'),
                 seat:rule.preferSeat,
                 startTime:startHour*60+startMin,
                 endTime:endHour*60+endMin

@@ -112,7 +112,17 @@ class UserController {
       return null;
     })
   }
-
+  // 检查用户是否已存在
+  checkUserExist(email){
+    return models.user.findOne({
+      where:{
+        email:email,
+      }
+    }).then((user)=>{
+      return user;
+    })
+  }
+  
 
 
 

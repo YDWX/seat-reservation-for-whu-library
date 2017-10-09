@@ -3,14 +3,14 @@ const queue = kue.createQueue();
 
 const taskManager = require('./taskManager')
 
-queue.process('seat', 15, async (job, done) => {
-  try {
-    await taskManager.executeSeatTask(job);
-  } catch (e) {
+// queue.process('seat', 15, async (job, done) => {
+//   try {
+//     await taskManager.executeSeatTask(job);
+//   } catch (e) {
 
-  }
-  done();
-})
+//   }
+//   done();
+// })
 
 queue.process('email', async (job, ctx, done) => {
   try {
@@ -25,7 +25,17 @@ queue.process('email', async (job, ctx, done) => {
  * 检测新一天的抢座时候开启
  */
 queue.process('seatBootstrap', async (job, done) => {
-
+  /**因为登录成功后可能还没到抢座开始时间，
+   * 所以需要检测能否开始抢座，可以之后再处理“seat”类任务
+   * 没有采用推迟queue.create 推迟创建任务的方式，而是推迟process */
+  queue.process('seat', 15, async (job, done) => {
+    try {
+      await taskManager.executeSeatTask(job);
+    } catch (e) {
+  
+    }
+    done();
+  })
 })
 
 /**
