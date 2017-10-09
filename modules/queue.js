@@ -3,7 +3,7 @@ const queue = kue.createQueue();
 
 const taskManager = require('./taskManager')
 
-queue.process('seat', 15, (job, done) => {
+queue.process('seat', 15, async (job, done) => {
   try {
     await taskManager.executeSeatTask(job);
   } catch (e) {
@@ -12,7 +12,7 @@ queue.process('seat', 15, (job, done) => {
   done();
 })
 
-queue.process('email', (job, ctx, done) => {
+queue.process('email', async (job, ctx, done) => {
   try {
     await taskManager.executeEmailTask(job);
   } catch (e) {
@@ -24,14 +24,14 @@ queue.process('email', (job, ctx, done) => {
 /**
  * 检测新一天的抢座时候开启
  */
-queue.process('seatBootstrap', (job, done) => {
+queue.process('seatBootstrap', async (job, done) => {
 
 })
 
 /**
  * 抢座的登陆
  */
-queue.process('login', 15, (job, done) => {
+queue.process('login', 15, async (job, done) => {
   try {
     await taskManager.executeLoginTask(job);
   } catch (e) {
@@ -43,7 +43,7 @@ queue.process('login', 15, (job, done) => {
 /**
  * 创建账号的验证
  */
-queue.process('verify', 15, (job, done) => {
+queue.process('verify', 15, async (job, done) => {
   try {
     await taskManager.executeVerifyTask(job);
   } catch (e) {

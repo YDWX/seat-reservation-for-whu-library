@@ -1,7 +1,6 @@
 const schedule = require('node-schedule');
 
 const models = require("../models");
-const queue = require('./queue');
 
 // var seatReservation = require("./seatReservation.js");
 const mailReceiver = require("./mail/mailReceiver");

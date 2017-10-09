@@ -5,7 +5,7 @@ const simpleParser = require('mailparser').simpleParser;
 
 const mailConfig = require('../../config/mail.conf');
 const mailManager = require('./mailManager');
-
+const mailAnalysor = require('./mailAnalysor');
 class MailReceiver {
   constructor(mailAnalysor) {
     this.imap = new Imap({
@@ -48,7 +48,13 @@ class MailReceiver {
               stream.once('end', () => {
                 simpleParser(buffer, (err, mail) => {
                   if (err) throw err;
-                  mailAnalysor(mail.from.value[0].address, mail.subject, mail.text);
+                  //TODO: 分析邮件内容添加抢座任务到数据库
+                  // const mailobjext = {
+                  //   email:mail.from.value[0].address, 
+                  //   subjext:mail.subject, 
+                  //   text:mail.text
+                  // }
+                  // mailAnalysor.analyse(mailobject);
                 })
               });
             });
@@ -90,4 +96,4 @@ class MailReceiver {
   }
 }
 
-module.exports = MailReceiver;
+module.exports = new MailReceiver();

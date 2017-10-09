@@ -22,6 +22,8 @@ class UserManager {
         data
       }) => {
         if (data.status == 'success') {
+          //TODO:登录成功需要修改数据库user的token字段
+          userController.saveToken(,data.data.token)
           return data.data.token;
         } else {
           return null;

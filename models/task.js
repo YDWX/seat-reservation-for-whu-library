@@ -19,7 +19,7 @@ module.exports = function (sequelize, DataTypes) {
       default: 'seat'
     }
   });
-
+  //table task add foreign key user
   task.associate = function (models) {
     task.belongsTo(models.user, {
       as: "user"
