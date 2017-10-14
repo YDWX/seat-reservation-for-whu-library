@@ -1,6 +1,5 @@
-const userController = require('../../controllers/userController');
 const seatApi = require('../seatApi');
-
+const date = require('./Date');
 class UserManager {
   constructor() {
 
@@ -22,8 +21,6 @@ class UserManager {
         data
       }) => {
         if (data.status == 'success') {
-          //TODO:登录成功需要修改数据库user的token字段
-          userController.saveToken(,data.data.token)
           return data.data.token;
         } else {
           return null;
@@ -31,6 +28,18 @@ class UserManager {
       })
   }
 
+  getStartTime(token){
+    return seatApi.GET_STARTTIME(token)
+      .then((data)=>{
+        if(data.status == "success"){
+          if(data.data.dates.indexOf(date.prototype.getAnyDay(1))!=-1){
+            return true;
+          }else{
+            return false;
+          }
+        }
+      })
+  }
 }
 
 const userManager = new UserManager();

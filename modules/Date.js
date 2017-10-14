@@ -13,5 +13,10 @@ Date.prototype.Format = function (fmt) { //author: meizz
     if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
 }
+//number是相对于今天的天数
+Date.prototype.getAnyDay = function(number){
+    const today = new Date();
+    return new Date(today.setDate(today.getDate()+number));
+}
 
 module.exports = Date;

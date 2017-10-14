@@ -46,5 +46,26 @@ module.exports = {
       endTime,
       token
     }))
+  },
+  // {
+  //   "status": "success",
+  //   "data": {
+  //     "buildings": [
+  //       [1, "信息科学分馆", 5],
+  //     ],
+  //     "rooms": [
+  //       [4, "一楼3C创客空间", 1, 1],
+  //     ],
+  //     "hours": 14,
+  //     "dates": ["2017-10-12"]
+  //   },
+  //   "message": "",
+  //   "code": "0"
+  // }
+
+  GET_STARTTIME(token){
+    return axios.post('/v2/free/filters', qs.stringify({
+      token,
+    }))
   }
 }
