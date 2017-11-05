@@ -16,6 +16,11 @@ const date = require('./Date');
 
 let tokenForBootstrapCount = 1;
 
+
+const createSeatJob = (queue, seatDetail) => {
+  queue.create('seat', seatDetail);
+}
+
 class TaskManager {
   constructor() {
   }
@@ -26,6 +31,7 @@ class TaskManager {
       const {
         token,
         date,
+        seats,
         seat,
         startTime,
         endTime
@@ -34,11 +40,20 @@ class TaskManager {
         const bookStatus = seatManager.bookSeat(token, date, seat, startTime, endTime);
         //TODO:
         if (bookStatus) {
-          logger.debug("book seat success date:[%d] from:[%d] to:[%d]", date, startTime, endTime);
-        } else {
-          //如果抢座失败且preferseat数组中还有其他座位则继续创建抢座任务
-
+          logger.debug("book seat success date:[%d] from:[%d] to:[%d] seat:[%d]", date, startTime, endTime, seat);
+          done();
+          return;
+        } 
+        logger.debug("book seat fail date:[%d] from:[%d] to:[%d] seat:[%d]", date, startTime, endTime, seat);
+        //如果抢座失败且preferseat数组中还有其他座位则继续创建抢座任务
+        if(seats.length>=2){
+          seats.shift();
+          let seatDetail = {token, date, seats, seat:seats[0], startTime, endTime};
+          createSeatJob(queue, seatDetail);
+        }else{
+          //TODO:发送今天抢座失败邮件
         }
+        done(new Error("fail"));
         resolve();
       } catch (e) {
         reject(e);
@@ -74,7 +89,6 @@ class TaskManager {
             //在这里登陆成功要创建 SeatBootstrap 任务检测是否到开始选座的时间，检测没到时间要继续创建该任务执行，直到检测到了时间才能 process seat task
             if(tokenForBootstrapCount){
               queue.create("seatBootstrap",{
-                id:2,
                 token
               })
               .attempts(1000)
@@ -91,13 +105,15 @@ class TaskManager {
               const [startHour, startMin, endHour, endMin] = during.split(' ').map((item) => {
                 return parseInt(item);
               });
-              queue.create('seat', {
+              const seatDetail = {
                 token,
                 date: date.prototype.getAnyDay(1).Format('yyyy-MM-dd'),
-                seat: JSON.parse(rule.preferSeat),//TODO:传入选座数组，里面有多个座位，从第一个座位开始请求，如果成功那么发送成功邮件，如果失败继续选第二个座位，以此类推
+                seats: JSON.parse(rule.preferSeat),//TODO:传入选座数组，里面有多个座位，从第一个座位开始请求，如果成功那么发送成功邮件，如果失败继续选第二个座位，以此类推
+                seat: JSON.parse(rule.preferSeat)[0],
                 startTime: startHour * 60 + startMin,
                 endTime: endHour * 60 + endMin
-              })
+              }
+              createSeatJob(queue, seatDetail);
             });
             done();
           } else {
