@@ -4,10 +4,10 @@ const inspect = require('util').inspect;
 const simpleParser = require('mailparser').simpleParser;
 
 const mailConfig = require('../../config/mail.conf');
-const mailManager = require('./mailManager');
 const mailAnalysor = require('./mailAnalysor');
+const mailManager = require('./mailManager');
 class MailReceiver {
-  constructor(mailAnalysor) {
+  constructor() {
     this.imap = new Imap({
       user: mailConfig.username,
       password: mailConfig.password,
@@ -49,12 +49,12 @@ class MailReceiver {
                 simpleParser(buffer, (err, mail) => {
                   if (err) throw err;
                   //TODO: 分析邮件内容添加抢座任务到数据库
-                  // const mailobjext = {
-                  //   email:mail.from.value[0].address, 
-                  //   subjext:mail.subject, 
-                  //   text:mail.text
-                  // }
-                  // mailAnalysor.analyse(mailobject);
+                  const mailobject = {
+                    email:mail.from.value[0].address, 
+                    subject:mail.subject, 
+                    text:mail.text
+                  }
+                  mailAnalysor.analyse(mailobject);
                 })
               });
             });

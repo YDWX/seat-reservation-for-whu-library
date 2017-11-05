@@ -10,7 +10,7 @@ class RuleController {
       effectiveDate,
       expireDate
     }, rule)
-    return models.rule.create(opt)
+    return models.rule.create(opt);
   }
 
   disableRules(userId, disableStatus = true) {
@@ -33,7 +33,7 @@ class RuleController {
     return models.rule.findAll({
       where: {
         userId,
-        disabled: true,
+        // disabled: false, //QA:
         effectiveDate: {
           $lte: now
         },
@@ -58,15 +58,17 @@ class RuleController {
     _.forEach(ruleList, (ruleModel) => {
       reduceRule = Object.assign(reduceRule, ruleModel);
     })
+    //QA:
+    const resultRule = reduceRule.dataValues;
     let computedRule = {
-      mon: reduceRule.mon,
-      tue: reduceRule.tue,
-      wed: reduceRule.wed,
-      thu: reduceRule.thu,
-      fri: reduceRule.fri,
-      sat: reduceRule.sat,
-      sun: reduceRule.sun,
-      preferSeat: reduceRule.preferSeat
+      mon: resultRule.mon,
+      tue: resultRule.tue,
+      wed: resultRule.wed,
+      thu: resultRule.thu,
+      fri: resultRule.fri,
+      sat: resultRule.sat,
+      sun: resultRule.sun,
+      preferSeat: resultRule.preferSeat
     }
     return computedRule;
   }

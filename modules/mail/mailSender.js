@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const mailConfig = require('../config/mail.conf');
+const mailConfig = require('../../config/mail.conf.js');
 
 class MailSender {
   constructor() {

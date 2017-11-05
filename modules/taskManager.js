@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const log4js = require("log4js");
 const logger = log4js.getLogger();
 const taskController = require('../controllers/taskController');
@@ -9,14 +8,17 @@ const userManager = require('./user/userManager');
 const seatManager = require('./seat/seatManager');
 
 const mailSender = require('./mail/mailSender');
-const queue = require('queue');
+
 const date = require('./Date');
 
 let tokenForBootstrapCount = 1;
-class TaskManager {
-  constructor() {}
 
-  executeSeatTask(job) {
+class TaskManager {
+  constructor() {
+  }
+
+  executeSeatTask(job, done) {
+    const queue = require('./queue');
     return new Promise((resolve, reject) => {
       //TODO:
       const {
@@ -25,7 +27,7 @@ class TaskManager {
         seat,
         startTime,
         endTime
-      } = job;
+      } = job.data;
       try {
         const bookStatus = seatManager.bookSeat(token, date, seat, startTime, endTime);
         //TODO:
@@ -42,56 +44,57 @@ class TaskManager {
     })
   }
 
-  executeEmailTask(job) {
+  executeEmailTask(job, done) {
     return new Promise((resolve, reject) => {
       const {
         to,
         text
-      } = job;
+      } = job.data;
       //TODO:
       new mailSender().send(to, "图书馆座位预约", text);
     })
   }
 
-  executeLoginTask(job) {
-    return new Promise(async(resolve, reject) => {
+  executeLoginTask(job, done) {
+    const queue = require('./queue');
+    return new Promise((resolve, reject) => {
       const {
-        id,
+        userId,
         username,
         password
-      } = job;
+      } = job.data;
       try {
         const tokenPromise = userManager.login(username, password);
         //TODO:结果处理,登录成功后创建seat任务开始抢座
-        tokenPromise.then((token) => {
+        tokenPromise.then(async (token) => {
           if (token) {
             logger.debug("login success user:[%s]", username);
+            await userController.saveToken(userId, token);
             //在这里登陆成功要创建 SeatBootstrap 任务检测是否到开始选座的时间，检测没到时间要继续创建该任务执行，直到检测到了时间才能 process seat task
             if(tokenForBootstrapCount){
-              queue.create("SeatBootstrap",{
+              queue.create("seatBootstrap",{
+                id:2,
                 token
               })
+              .save();
               tokenForBootstrapCount--;
             }
-            
-            userController.saveToken(id, token);
             // 根据userid查询当前用户的抢座任务（用户通过邮件创建的）
-            ruleController.getComputedRule(id).then(function (rule) {
+            ruleController.getComputedRule(userId).then(function (rule) {
               const during = rule[(new Date()).toString().slice(0, 3).toLowerCase()];
-              if (rule[during]) {
-                const [startHour, startMin, endHour, endMin] = during.split(' ').map((item) => {
-                  return parseInt(item)
-                });
-                queue.create('seat', {
-                  token,
-                  date: date.prototype.getAnyDay(1).Format('yyyy-MM-dd'),
-                  seat: rule.preferSeat,
-                  startTime: startHour * 60 + startMin,
-                  endTime: endHour * 60 + endMin
-                })
-              }else{
-                //TODO:
+              if (!during) {
+                return;
               }
+              const [startHour, startMin, endHour, endMin] = during.split(' ').map((item) => {
+                return parseInt(item);
+              });
+              queue.create('seat', {
+                token,
+                date: date.prototype.getAnyDay(1).Format('yyyy-MM-dd'),
+                seat: JSON.parse(rule.preferSeat),//TODO:传入选座数组，里面有多个座位，从第一个座位开始请求，如果成功那么发送成功邮件，如果失败继续选第二个座位，以此类推
+                startTime: startHour * 60 + startMin,
+                endTime: endHour * 60 + endMin
+              })
             });
           } else {
             logger.debug("login failed user:[%s]", username);
@@ -111,13 +114,13 @@ class TaskManager {
    * @returns 
    * @memberof TaskManager
    */
-  executeVerifyTask(job) {
+  executeVerifyTask(job, done) {
     return new Promise(async(resolve, reject) => {
       const {
         email,
         username,
         password
-      } = job;
+      } = job.data;
       try {
         const token = await userManager.login(username, password);
         if (token) {
@@ -139,11 +142,12 @@ class TaskManager {
     })
   }
 
-  executeSeatBootstrapTask(job) {
-    return new Peomise(async(resolve, reject)=>{
+  executeSeatBootstrapTask(job, done) {
+    const queue = require('./queue');
+    return new Promise(async(resolve, reject)=>{
       const {
         token
-      } = job;
+      } = job.data;
       try{
         if(!token){
           reject("no token");
@@ -166,8 +170,7 @@ class TaskManager {
           }
           queue.create('seatBootstrap',{
             token
-          })
-          reject();
+          }).save();
         })
       }catch(e){
         reject(e);

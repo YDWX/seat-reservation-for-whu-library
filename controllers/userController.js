@@ -12,7 +12,9 @@ class UserController {
       },
       defaults: {
         username,
-        password
+        password,
+        disabled:false, 
+        status:true
       }
     }).spread((userModel, created) => {
       if (created) {
@@ -102,7 +104,7 @@ class UserController {
           userModel.computedRule = ruleController.computeRules(userModel.rules);
           return userModel;
         }).filter((userModel) => {
-          if (userModel.computedRule && userModel.computedRule.length) {
+          if (userModel.computedRule && JSON.parse(userModel.computedRule.preferSeat).length) {
             return true;
           }
           return false;

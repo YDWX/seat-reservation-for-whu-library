@@ -1,4 +1,6 @@
-const queue = require('queue');
+const queue = require('./queue');
+const _ = require('lodash');
+const userController = require('../controllers/userController');
 class seatReservation{
   constructor(){
 
@@ -16,7 +18,7 @@ class seatReservation{
     })
   }
   execute(){
-    initializeSeatTasks();
+    this.initializeSeatTasks();
   }
 }
 module.exports = new seatReservation();

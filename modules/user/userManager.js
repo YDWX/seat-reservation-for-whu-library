@@ -1,5 +1,5 @@
 const seatApi = require('../seatApi');
-const date = require('./Date');
+const date = require('../Date');
 class UserManager {
   constructor() {
 
@@ -30,7 +30,7 @@ class UserManager {
 
   getStartTime(token){
     return seatApi.GET_STARTTIME(token)
-      .then((data)=>{
+      .then(({data})=>{
         if(data.status == "success"){
           if(data.data.dates.indexOf(date.prototype.getAnyDay(1))!=-1){
             return true;
