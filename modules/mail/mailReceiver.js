@@ -48,11 +48,10 @@ class MailReceiver {
               stream.once('end', () => {
                 simpleParser(buffer, (err, mail) => {
                   if (err) throw err;
-                  //TODO: 分析邮件内容添加抢座任务到数据库
                   const mailobject = {
-                    email:mail.from.value[0].address, 
-                    subject:mail.subject, 
-                    text:mail.text
+                    email: mail.from.value[0].address,
+                    subject: mail.subject,
+                    text: mail.text
                   }
                   mailAnalysor.analyse(mailobject);
                 })

@@ -14,13 +14,11 @@ const date = require('./Date');
 let tokenForBootstrapCount = 1;
 
 class TaskManager {
-  constructor() {
-  }
+  constructor() {}
 
   executeSeatTask(job, done) {
     const queue = require('./queue');
     return new Promise((resolve, reject) => {
-      //TODO:
       const {
         token,
         date,
@@ -30,7 +28,6 @@ class TaskManager {
       } = job.data;
       try {
         const bookStatus = seatManager.bookSeat(token, date, seat, startTime, endTime);
-        //TODO:
         if (bookStatus) {
           logger.debug("book seat success date:[%d] from:[%d] to:[%d]", date, startTime, endTime);
         } else {
@@ -50,7 +47,6 @@ class TaskManager {
         to,
         text
       } = job.data;
-      //TODO:
       new mailSender().send(to, "图书馆座位预约", text);
     })
   }
@@ -65,18 +61,17 @@ class TaskManager {
       } = job.data;
       try {
         const tokenPromise = userManager.login(username, password);
-        //TODO:结果处理,登录成功后创建seat任务开始抢座
         tokenPromise.then(async (token) => {
           if (token) {
             logger.debug("login success user:[%s]", username);
             await userController.saveToken(userId, token);
             //在这里登陆成功要创建 SeatBootstrap 任务检测是否到开始选座的时间，检测没到时间要继续创建该任务执行，直到检测到了时间才能 process seat task
-            if(tokenForBootstrapCount){
-              queue.create("seatBootstrap",{
-                id:2,
-                token
-              })
-              .save();
+            if (tokenForBootstrapCount) {
+              queue.create("seatBootstrap", {
+                  id: 2,
+                  token
+                })
+                .save();
               tokenForBootstrapCount--;
             }
             // 根据userid查询当前用户的抢座任务（用户通过邮件创建的）
@@ -91,7 +86,7 @@ class TaskManager {
               queue.create('seat', {
                 token,
                 date: date.prototype.getAnyDay(1).Format('yyyy-MM-dd'),
-                seat: JSON.parse(rule.preferSeat),//TODO:传入选座数组，里面有多个座位，从第一个座位开始请求，如果成功那么发送成功邮件，如果失败继续选第二个座位，以此类推
+                seat: JSON.parse(rule.preferSeat), //TODO:传入选座数组，里面有多个座位，从第一个座位开始请求，如果成功那么发送成功邮件，如果失败继续选第二个座位，以此类推
                 startTime: startHour * 60 + startMin,
                 endTime: endHour * 60 + endMin
               })
@@ -115,7 +110,7 @@ class TaskManager {
    * @memberof TaskManager
    */
   executeVerifyTask(job, done) {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const {
         email,
         username,
@@ -144,16 +139,16 @@ class TaskManager {
 
   executeSeatBootstrapTask(job, done) {
     const queue = require('./queue');
-    return new Promise(async(resolve, reject)=>{
+    return new Promise(async (resolve, reject) => {
       const {
         token
       } = job.data;
-      try{
-        if(!token){
+      try {
+        if (!token) {
           reject("no token");
         }
-        userManager.getStartTime(token).then((data)=>{
-          if(data){
+        userManager.getStartTime(token).then((data) => {
+          if (data) {
             /**因为登录成功后可能还没到抢座开始时间，
              * 所以需要检测能否开始抢座，可以之后再处理“seat”类任务
              * 没有采用推迟queue.create 推迟创建任务的方式，而是推迟process */
@@ -161,18 +156,18 @@ class TaskManager {
               try {
                 await taskManager.executeSeatTask(job);
               } catch (e) {
-            
+
               }
               done();
             });
             resolve();
             return;
           }
-          queue.create('seatBootstrap',{
+          queue.create('seatBootstrap', {
             token
           }).save();
         })
-      }catch(e){
+      } catch (e) {
         reject(e);
       }
     })

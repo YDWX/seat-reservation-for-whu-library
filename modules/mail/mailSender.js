@@ -17,7 +17,7 @@ class MailSender {
       from: mailConfig.nickname + " <" + mailConfig.username + ">"
     });
   }
-  
+
   send(target, subject, html) {
     // setup email data with unicode symbols
     const mailOptions = {
@@ -37,4 +37,4 @@ class MailSender {
 
 }
 
-module.exports = MailSender;
+module.exports = new MailSender();

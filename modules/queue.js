@@ -18,16 +18,16 @@ let tokenForBootstrapCount = 1;
 
 
 const createSeatJob = (queue, seatDetail) => {
-  queue.create('seat', seatDetail);
+  queue.create('seat', seatDetail)
+    .attempts(3)
+    .save();
 }
 
 class TaskManager {
-  constructor() {
-  }
+  constructor() {}
 
   executeSeatTask(job, done) {
-    return new Promise((resolve, reject) => {
-      //TODO:
+    return new Promise(async (resolve, reject) => {
       const {
         token,
         date,
@@ -37,20 +37,26 @@ class TaskManager {
         endTime
       } = job.data;
       try {
-        const bookStatus = seatManager.bookSeat(token, date, seat, startTime, endTime);
-        //TODO:
+        const bookStatus = await seatManager.bookSeat(token, date, seat, startTime, endTime);
         if (bookStatus) {
           logger.debug("book seat success date:[%d] from:[%d] to:[%d] seat:[%d]", date, startTime, endTime, seat);
           done();
           return;
-        } 
+        }
         logger.debug("book seat fail date:[%d] from:[%d] to:[%d] seat:[%d]", date, startTime, endTime, seat);
         //如果抢座失败且preferseat数组中还有其他座位则继续创建抢座任务
-        if(seats.length>=2){
+        if (seats.length >= 2) {
           seats.shift();
-          let seatDetail = {token, date, seats, seat:seats[0], startTime, endTime};
+          let seatDetail = {
+            token,
+            date,
+            seats,
+            seat: seats[0],
+            startTime,
+            endTime
+          };
           createSeatJob(queue, seatDetail);
-        }else{
+        } else {
           //TODO:发送今天抢座失败邮件
         }
         done(new Error("fail"));
@@ -67,7 +73,6 @@ class TaskManager {
         to,
         text
       } = job.data;
-      //TODO:
       new mailSender().send(to, "图书馆座位预约", text);
     })
   }
@@ -81,19 +86,21 @@ class TaskManager {
       } = job.data;
       try {
         const tokenPromise = userManager.login(username, password);
-        //TODO:结果处理,登录成功后创建seat任务开始抢座
         tokenPromise.then(async (token) => {
           if (token) {
             logger.debug("login success user:[%s]", username);
             await userController.saveToken(userId, token);
             //在这里登陆成功要创建 SeatBootstrap 任务检测是否到开始选座的时间，检测没到时间要继续创建该任务执行，直到检测到了时间才能 process seat task
-            if(tokenForBootstrapCount){
-              queue.create("seatBootstrap",{
-                token
-              })
-              .attempts(1000)
-              .backoff({delay:5*1000, type:'fixed'})
-              .save();
+            if (tokenForBootstrapCount) {
+              queue.create("seatBootstrap", {
+                  token
+                })
+                .attempts(1000)
+                .backoff({
+                  delay: 5 * 1000,
+                  type: 'fixed'
+                })
+                .save();
               tokenForBootstrapCount--;
             }
             // 根据userid查询当前用户的抢座任务（用户通过邮件创建的）
@@ -108,7 +115,7 @@ class TaskManager {
               const seatDetail = {
                 token,
                 date: date.prototype.getAnyDay(1).Format('yyyy-MM-dd'),
-                seats: JSON.parse(rule.preferSeat),//TODO:传入选座数组，里面有多个座位，从第一个座位开始请求，如果成功那么发送成功邮件，如果失败继续选第二个座位，以此类推
+                seats: JSON.parse(rule.preferSeat), //传入选座数组，里面有多个座位，从第一个座位开始请求，如果成功那么发送成功邮件，如果失败继续选第二个座位，以此类推
                 seat: JSON.parse(rule.preferSeat)[0],
                 startTime: startHour * 60 + startMin,
                 endTime: endHour * 60 + endMin
@@ -136,7 +143,7 @@ class TaskManager {
    * @memberof TaskManager
    */
   executeVerifyTask(job, done) {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const {
         email,
         username,
@@ -164,16 +171,16 @@ class TaskManager {
   }
 
   executeSeatBootstrapTask(job, done) {
-    return new Promise(async(resolve, reject)=>{
+    return new Promise(async (resolve, reject) => {
       const {
         token
       } = job.data;
-      try{
-        if(!token){
+      try {
+        if (!token) {
           reject("no token");
         }
-        userManager.getStartTime(token).then((data)=>{
-          if(data){
+        userManager.getStartTime(token).then((data) => {
+          if (data) {
             /**因为登录成功后可能还没到抢座开始时间，
              * 所以需要检测能否开始抢座，可以之后再处理“seat”类任务
              * 没有采用推迟queue.create 推迟创建任务的方式，而是推迟process */
@@ -181,7 +188,7 @@ class TaskManager {
               try {
                 await taskManager.executeSeatTask(job, done);
               } catch (e) {
-            
+
               }
             });
             done();
@@ -189,9 +196,9 @@ class TaskManager {
             return;
           }
           done(new Error('fail'));
-          
+
         })
-      }catch(e){
+      } catch (e) {
         reject(e);
       }
     })
@@ -221,9 +228,9 @@ queue.process('email', async (job, ctx, done) => {
  * 检测新一天的抢座时候开启
  */
 queue.process('seatBootstrap', async (job, done) => {
-  try{
+  try {
     await taskManager.executeSeatBootstrapTask(job, done);
-  }catch(e){
+  } catch (e) {
 
   }
 })

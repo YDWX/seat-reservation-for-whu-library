@@ -28,13 +28,15 @@ class UserManager {
       })
   }
 
-  getStartTime(token){
+  getStartTime(token) {
     return seatApi.GET_STARTTIME(token)
-      .then(({data})=>{
-        if(data.status == "success"){
-          if(data.data.dates.indexOf(date.prototype.getAnyDay(1))!=-1){
+      .then(({
+        data
+      }) => {
+        if (data.status == "success") {
+          if (data.data.dates.indexOf(date.prototype.getAnyDay(1)) != -1) {
             return true;
-          }else{
+          } else {
             return false;
           }
         }

@@ -18,15 +18,15 @@ class Schedule {
      * 每一分钟检测一次邮件
      */
     // this.mailSchedule = schedule.scheduleJob('*/1 * * * *', () => {
-    // mailReceiver.execute();
+    mailReceiver.execute();
     // });
 
     /**
      * 每天晚上10点25开始执行抢座前的等待
      */
-    // this.seatSchedule = schedule.scheduleJob("25 22 * * *", function(){
+    this.seatSchedule = schedule.scheduleJob("10 22 * * *", function () {
       this.seatReservation.execute();
-    // });
+    });
 
     // this.mailSender.send("635020058@qq.com", "实验邮件", "没有内容");
   }
